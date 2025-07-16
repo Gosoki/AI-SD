@@ -31,12 +31,12 @@ def get_neighbor_prompts_with_translation(current_keywords, history_log):
         "他の説明は一切不要です。"
     )
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": f"現在のキーワード: {current_keywords}"}],
             max_tokens=500, temperature=0.7, response_format={"type": "json_object"}
         )
-        content = json.loads(response.choices[0].message["content"])
+        content = json.loads(response.choices[0].message.content)
         return content.get("suggestions", [])
     except Exception as e:
         print(f"GPT提案生成エラー: {e}")
@@ -50,12 +50,12 @@ def refine_prompt_with_feedback(base_keywords, user_feedback):
         "出力は、「日本語」「英語」「キーワード」の3つの要素を含むフォーマットで返してください。"
     )
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": f"ベースとなるキーワード: {base_keywords}\n\nユーザーの要望: {user_feedback}"}],
             max_tokens=300
         )
-        return response.choices[0].message["content"].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"フィードバックの反映に失敗しました: {e}"
 
@@ -67,10 +67,10 @@ def optimize_initial_prompt(user_prompt):
         "フォーマット:\n日本語: [ここに説明]\n英語: [ここに翻訳]\nキーワード: [ここにキーワード]"
     )
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4o-mini", messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": f"テーマ: {user_prompt}"}], max_tokens=300
         )
-        return response.choices[0].message["content"].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"プロンプトの最適化に失敗しました: {e}"
 
